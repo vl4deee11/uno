@@ -59,16 +59,12 @@ func GetOpponentHand(hand []Card, discard []Card) []Card {
 }
 
 func CanNextMove(c *Card, d *Card) bool {
-	if d.Type == Skip || d.Type == TakeTwo || d.Type == TakeFourChooseColor {
-		return false
-	}
-	if c.Type == ChooseColor || c.Type == TakeFourChooseColor {
-		return true
-	}
-	if c.Color == d.Color || c.Num == d.Num {
-		return true
-	}
-	return false
+	if c.Type == ChooseColor || c.Type == TakeFourChooseColor{return true}
+	if c.Color != d.Color && c.Num != d.Num {return false}
+	// TODO: handle reverse
+	if c.Type == Reverse || d.Type == Reverse {return false}
+	if d.Type == Skip || d.Type == TakeTwo || d.Type == TakeFourChooseColor {return false}
+	return true
 }
 
 func (c *Card) String() string {

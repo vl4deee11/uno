@@ -112,13 +112,13 @@ func (c *Communicator) Board() (*BoardResp, error) {
 }
 
 
-func (c *Communicator) Move(card *engine.Card) error {
+func (c *Communicator) Move(cards []engine.Card) error {
 	m := map[string]interface{}{
 		"token": c.token,
 		"matchId": c.matchId,
-		"color": card.Color,
+		"color": cards[0].Color,
 	}
-	m["cards"] = []*engine.Card{card}
+	m["cards"] = cards
 
 	jd, err := json.Marshal(m)
 	if err != nil {
