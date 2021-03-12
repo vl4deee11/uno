@@ -123,6 +123,10 @@ func GetNextCard(hand []Card, opponent []Card, curr *Card) []Card {
 	max := -math.MaxFloat64
 	var bestCard *Card
 	for i := 0; i < len(root.Nodes); i++ {
+		if root.Nodes[i].MaxE > max && root.Nodes[i].MaxE != 0{
+			max = root.Nodes[i].MaxE
+			bestCard = root.Nodes[i].Curr
+		}
 		if root.Nodes[i].MinE > max {
 			max = root.Nodes[i].MinE
 			bestCard = root.Nodes[i].Curr
