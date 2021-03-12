@@ -110,3 +110,32 @@ func (c *Communicator) Board() (*BoardResp, error) {
 	}
 	return br, nil
 }
+
+
+func (c *Communicator) Move(card *engine.Card) error {
+	m := map[string]interface{}{
+		"token": c.token,
+		"matchId": c.matchId,
+		"color": card.Color,
+	}
+	m["cards"] = []*engine.Card{card}
+
+	jd, err := json.Marshal(m)
+	if err != nil {
+		return err
+	}
+
+	resp, err := http.Post(
+		fmt.Sprintf("%s/api/Game/move", c.Url),
+		"application/json",
+		bytes.NewBuffer(jd),
+	)
+	if err != nil {
+		return err
+	}
+	if resp.StatusCode != http.StatusOK {
+		return errors.New(fmt.Sprintf("start game exit with code = %d", resp.StatusCode))
+	}
+	fmt.Printf("Make turn\n")
+	return nil
+}

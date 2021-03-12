@@ -8,19 +8,19 @@ import (
 )
 
 func main() {
-	dlr := communicator.Communicator{Url: "https://unoserver20210228202123.azurewebsites.net", Name: "vl4deee11"}
+	com := communicator.Communicator{Url: "https://unoserver20210228202123.azurewebsites.net", Name: "vl4deee11"}
 	engine.GenerateAllCards()
 	discard := make([]engine.Card, 0)
-	if err := dlr.Token(); err != nil {
+	if err := com.Token(); err != nil {
 		panic(err)
 	}
 
-	if err := dlr.StartGame(""); err != nil {
+	if err := com.StartGame(""); err != nil {
 		panic(err)
 	}
 
 	for {
-		board, err := dlr.Board()
+		board, err := com.Board()
 		if err != nil {
 			panic(err)
 		}
@@ -34,8 +34,19 @@ func main() {
 		fmt.Println("Next step")
 		t := time.Now()
 		discard = append(discard, board.CurrCard)
-		_ = engine.GetOpponentHand(board.Hand, discard)
-		fmt.Println(time.Since(t))
+		if board.CurrCard.Type == engine.Skip {
+			if err := com.Move(nil); err != nil {
+				panic(err)
+			}
+		}
 
+		opponent := engine.GetOpponentHand(board.Hand, discard)
+		nextCard := engine.GetNextCard(board.Hand, opponent, &board.CurrCard)
+		fmt.Printf("Card on board = (%s)\n", board.CurrCard.String())
+		fmt.Printf("Card my turn card = (%s)\n", nextCard.String())
+		fmt.Println(time.Since(t))
+		if err := com.Move(nextCard); err != nil {
+			panic(err)
+		}
 	}
 }

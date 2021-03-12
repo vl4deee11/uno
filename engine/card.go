@@ -30,7 +30,7 @@ func GenerateAllCards() {
 	fmt.Println("All card added to map")
 }
 
-func GetOpponentHand(hand []Card, discard []Card) map[Card]uint8 {
+func GetOpponentHand(hand []Card, discard []Card) []Card {
 	r := make(map[Card]uint8, len(allCards))
 	for k := range allCards {
 		r[k] = allCards[k]
@@ -47,5 +47,62 @@ func GetOpponentHand(hand []Card, discard []Card) map[Card]uint8 {
 			r[discard[i]]--
 		}
 	}
-	return r
+
+	rs := make([]Card, 0)
+	for k, v := range r {
+		for i := 1; i <= int(v); i++ {
+			rs = append(rs, k)
+		}
+	}
+
+	return rs
+}
+
+func CanNextMove(c *Card, d *Card) bool {
+	if d.Type == Skip || d.Type == TakeTwo || d.Type == TakeFourChooseColor {
+		return false
+	}
+	if c.Type == ChooseColor || c.Type == TakeFourChooseColor {
+		return true
+	}
+	if c.Color == d.Color || c.Num == d.Num {
+		return true
+	}
+	return false
+}
+
+func (c *Card) String() string {
+	return fmt.Sprintf("Color = %s, Type = %s, Number = %d", c.color(), c.cType(), c.Num)
+}
+
+func (c *Card) color() string  {
+	switch c.Color {
+	case  Red:
+		return "Red"
+	case Green:
+		return "Green"
+	case Blue:
+		return "Blue"
+	default:
+		return "Black"
+	}
+}
+
+func (c *Card) cType() string  {
+	switch c.Type {
+	case  Numeric:
+		return "Numeric"
+	case Reverse:
+		return "Reverse"
+	case Skip:
+		return "Skip"
+	case  TakeTwo:
+		return "TakeTwo"
+	case TakeFourChooseColor:
+		return "TakeFourChooseColor"
+	case ChooseColor:
+		return "ChooseColor"
+	default:
+		return "????"
+	}
 }
