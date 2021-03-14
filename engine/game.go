@@ -27,7 +27,7 @@ func (n *Node) AddE(e float32, c *Card) {
 	n.estims = append(n.estims, &Pair{e, c})
 }
 
-func (n *Node) PutOnTable(c *Card){
+func (n *Node) PutOnTable(c *Card) {
 	n.table = append(n.table, c)
 }
 
@@ -51,7 +51,7 @@ func GetNextCard(hand []Card, opponent []Card, curr *Card) []Card {
 		if _, ok := usedCards[hand[i]]; !ok && CanNextMove(&hand[i], curr) {
 			n := &Node{
 				Hand:         remove(hand, i),
-				table:         root.table,
+				table:        root.table,
 				OpponentHand: opponent,
 				Nodes:        make([]*Node, 0, len(hand)),
 				Lvl:          1,
@@ -119,12 +119,12 @@ func GetNextCard(hand []Card, opponent []Card, curr *Card) []Card {
 		if len(node.Nodes) == 0 {
 			e := heuristicsEstimation(node)
 			if node.Lvl&1 == 0 {
-				// even
+				// even (opponent turn)
 				e = -e
 			}
 			node.Parent.AddE(e, node.TopFromTable())
 		} else if node.Lvl&1 == 0 {
-			// even
+			// even (opponent turn)
 			node.Parent.AddE(Max(node.estims).E, node.TopFromTable())
 		} else {
 			node.Parent.AddE(Min(node.estims).E, node.TopFromTable())
