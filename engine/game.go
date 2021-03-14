@@ -7,7 +7,7 @@ import (
 type Node struct {
 	Hand         []Card
 	OpponentHand []Card
-	Curr         *Card
+	table        []*Card
 	Nodes        []*Node
 	Parent       *Node
 	Lvl          uint8
@@ -27,11 +27,19 @@ func (n *Node) AddE(e float32, c *Card) {
 	n.estims = append(n.estims, &Pair{e, c})
 }
 
+func (n *Node) PutOnTable(c *Card){
+	n.table = append(n.table, c)
+}
+
+func (n *Node) TopFromTable() *Card {
+	return n.table[len(n.table)-1]
+}
+
 func GetNextCard(hand []Card, opponent []Card, curr *Card) []Card {
 	root := &Node{
 		Hand:         hand,
 		OpponentHand: opponent,
-		Curr:         curr,
+		table:        []*Card{curr},
 		Nodes:        make([]*Node, 0, len(hand)),
 		Lvl:          0,
 		Parent:       nil,
@@ -43,12 +51,13 @@ func GetNextCard(hand []Card, opponent []Card, curr *Card) []Card {
 		if _, ok := usedCards[hand[i]]; !ok && CanNextMove(&hand[i], curr) {
 			n := &Node{
 				Hand:         remove(hand, i),
-				Curr:         &hand[i],
+				table:         root.table,
 				OpponentHand: opponent,
 				Nodes:        make([]*Node, 0, len(hand)),
 				Lvl:          1,
 				Parent:       root,
 			}
+			n.PutOnTable(&hand[i])
 			root.Add(n)
 			s = append(s, n)
 		}
@@ -74,16 +83,17 @@ func GetNextCard(hand []Card, opponent []Card, curr *Card) []Card {
 
 		usedCards := map[Card]struct{}{}
 		for i := 0; i < len(l); i++ {
-			if _, ok := usedCards[l[i]]; !ok && CanNextMove(&l[i], node.Curr) {
+			if _, ok := usedCards[l[i]]; !ok && CanNextMove(&l[i], node.TopFromTable()) {
 				isLeaf = false
 				next := &Node{
 					Hand:         remove(l, i),
-					Curr:         &l[i],
+					table:        node.table,
 					Nodes:        make([]*Node, 0, len(l)),
 					Lvl:          node.Lvl + 1,
 					Parent:       node,
 					OpponentHand: node.Hand,
 				}
+				next.PutOnTable(&l[i])
 				node.Add(next)
 				usedCards[l[i]] = struct{}{}
 				s = append(s, next)
@@ -112,12 +122,12 @@ func GetNextCard(hand []Card, opponent []Card, curr *Card) []Card {
 				// even
 				e = -e
 			}
-			node.Parent.AddE(e, node.Curr)
+			node.Parent.AddE(e, node.TopFromTable())
 		} else if node.Lvl&1 == 0 {
 			// even
-			node.Parent.AddE(Max(node.estims).E, node.Curr)
+			node.Parent.AddE(Max(node.estims).E, node.TopFromTable())
 		} else {
-			node.Parent.AddE(Min(node.estims).E, node.Curr)
+			node.Parent.AddE(Min(node.estims).E, node.TopFromTable())
 		}
 
 		leafs = append(leafs, node.Parent)

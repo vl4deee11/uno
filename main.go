@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"time"
 	"uno/communicator"
 	"uno/engine"
@@ -12,17 +13,17 @@ func main() {
 	engine.GenerateAllCards()
 	discard := make([]engine.Card, 0)
 	if err := com.Token(); err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	if err := com.StartGame(""); err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	for {
 		board, err := com.Board()
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
 		if !board.MyMove {
 			continue
@@ -48,7 +49,7 @@ func main() {
 		}
 		fmt.Println(time.Since(t))
 		if err := com.Move(nextCards); err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
 	}
 }

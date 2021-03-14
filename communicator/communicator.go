@@ -57,45 +57,43 @@ func (c *Communicator) Token() error {
 }
 
 func (c *Communicator) StartGame(oToken string) error {
-	for {
-		m := map[string]string{"token": c.token}
+	m := map[string]string{"token": c.token}
 
-		if oToken != "" {
-			m["opponent"] = oToken
-		}
-
-		jd, err := json.Marshal(m)
-		if err != nil {
-			return err
-		}
-
-		resp, err := http.Post(
-			fmt.Sprintf("%s/api/Match/start", c.Url),
-			"application/json",
-			bytes.NewBuffer(jd),
-		)
-		if err != nil {
-			return err
-		}
-		if resp.StatusCode != http.StatusOK {
-			return errors.New(fmt.Sprintf("start game exit with code = %d", resp.StatusCode))
-		}
-
-		var res startResp
-
-		if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-			return err
-		}
-
-		if res.Status == 0 {
-			fmt.Printf("Cannot start game in queue, retry\n")
-			continue
-		}
-
-		c.matchId = res.MatchId
-		fmt.Printf("Game started\n")
-		return nil
+	if oToken != "" {
+		m["opponent"] = oToken
 	}
+
+	jd, err := json.Marshal(m)
+	if err != nil {
+		return err
+	}
+
+	resp, err := http.Post(
+		fmt.Sprintf("%s/api/Match/start", c.Url),
+		"application/json",
+		bytes.NewBuffer(jd),
+	)
+	if err != nil {
+		return err
+	}
+	if resp.StatusCode != http.StatusOK {
+		return errors.New(fmt.Sprintf("start game exit with code = %d", resp.StatusCode))
+	}
+
+	var res startResp
+
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return err
+	}
+
+	if res.Status == 0 {
+		return errors.New("cannot start game in queue")
+
+	}
+
+	c.matchId = res.MatchId
+	fmt.Printf("Game started\n")
+	return nil
 }
 
 func (c *Communicator) Board() (*BoardResp, error) {
