@@ -27,13 +27,6 @@ func (n *Node) AddE(e float32, c *Card) {
 	n.estims = append(n.estims, &Pair{e, c})
 }
 
-func (n *Node) AddPairE(p *Pair) {
-	if p == nil {
-		return
-	}
-	n.estims = append(n.estims, p)
-}
-
 func GetNextCard(hand []Card, opponent []Card, curr *Card) []Card {
 	root := &Node{
 		Hand:         hand,
