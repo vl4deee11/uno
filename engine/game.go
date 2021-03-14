@@ -1,9 +1,5 @@
 package engine
 
-import (
-	"math/rand"
-)
-
 type Node struct {
 	Hand         []Card
 	OpponentHand []Card
@@ -135,19 +131,18 @@ func GetNextCard(hand []Card, opponent []Card, curr *Card) []Card {
 
 	best := Max(root.estims)
 	if best != nil {
-		if best.C.Type != Numeric {
-			return []Card{*best.C}
-		}
-		return groupCards(*best.C, hand)
+		//if best.C.Type != Numeric {
+		//	return []Card{*best.C}
+		//}
+		//if best.C.Color == curr.Color {
+		//	return groupCardsByColor(*best.C, hand)
+		//}
+		return []Card{*best.C}
 	}
 	return []Card{}
 }
 
-func heuristicsEstimation(node *Node) float32 {
-	return rand.Float32() * 700
-}
-
-func groupCards(bestCard Card, hand []Card) []Card {
+func groupCardsByColor(bestCard Card, hand []Card) []Card {
 	var r []Card
 	for i := 0; i < len(hand); i++ {
 		if hand[i].Color == bestCard.Color && hand[i].Type == Numeric {

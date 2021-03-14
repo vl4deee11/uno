@@ -60,6 +60,11 @@ func GetOpponentHand(hand []Card, discard []Card) []Card {
 }
 
 func CanNextMove(c *Card, d *Card) bool {
+	if d.Type == Skip && c.Type != Skip {
+		// skip on table and our card is not skip
+		return false
+	}
+
 	if c.Type == ChooseColor || c.Type == TakeFourChooseColor {
 		// black active
 		return true
@@ -83,7 +88,7 @@ func CanNextMove(c *Card, d *Card) bool {
 		return true
 	}
 
-	if d.Type == Skip || d.Type == TakeTwo || d.Type == TakeFourChooseColor {
+	if d.Type == TakeTwo || d.Type == TakeFourChooseColor {
 		// no active cards or cards with same number or color
 		return false
 	}
