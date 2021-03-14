@@ -24,9 +24,10 @@ func GenerateAllCards() {
 		allCards[Card{Color: color, Type: Reverse}] = 2
 		allCards[Card{Color: color, Type: Skip}] = 2
 		allCards[Card{Color: color, Type: TakeTwo}] = 2
+		allCards[Card{Color: color, Type: ChooseColor}]++
+		allCards[Card{Color: color, Type: TakeFourChooseColor}]++
 	}
-	allCards[Card{Type: ChooseColor}] = 4
-	allCards[Card{Type: TakeFourChooseColor}] = 4
+
 	fmt.Println("All card added to map")
 }
 
@@ -59,11 +60,19 @@ func GetOpponentHand(hand []Card, discard []Card) []Card {
 }
 
 func CanNextMove(c *Card, d *Card) bool {
-	if c.Type == ChooseColor || c.Type == TakeFourChooseColor{return true}
-	if c.Color != d.Color && c.Num != d.Num {return false}
+	if c.Type == ChooseColor || c.Type == TakeFourChooseColor || c.Type == Skip {
+		return true
+	}
+	if c.Color != d.Color && c.Num != d.Num {
+		return false
+	}
 	// TODO: handle reverse
-	if c.Type == Reverse || d.Type == Reverse {return false}
-	if d.Type == Skip || d.Type == TakeTwo || d.Type == TakeFourChooseColor {return false}
+	if c.Type == Reverse || d.Type == Reverse {
+		return false
+	}
+	if d.Type == Skip || d.Type == TakeTwo || d.Type == TakeFourChooseColor {
+		return false
+	}
 	return true
 }
 
@@ -71,28 +80,30 @@ func (c *Card) String() string {
 	return fmt.Sprintf("Color = %s, Type = %s, Number = %d", c.color(), c.cType(), c.Num)
 }
 
-func (c *Card) color() string  {
+func (c *Card) color() string {
 	switch c.Color {
-	case  Red:
+	case Red:
 		return "Red"
 	case Green:
 		return "Green"
 	case Blue:
 		return "Blue"
+	case Yellow:
+		return "Yellow"
 	default:
 		return "Black"
 	}
 }
 
-func (c *Card) cType() string  {
+func (c *Card) cType() string {
 	switch c.Type {
-	case  Numeric:
+	case Numeric:
 		return "Numeric"
 	case Reverse:
 		return "Reverse"
 	case Skip:
 		return "Skip"
-	case  TakeTwo:
+	case TakeTwo:
 		return "TakeTwo"
 	case TakeFourChooseColor:
 		return "TakeFourChooseColor"

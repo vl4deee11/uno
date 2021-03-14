@@ -44,7 +44,7 @@ func main() {
 		nextCards := engine.GetNextCard(board.Hand, opponent, &board.CurrCard)
 		fmt.Printf("Card on board = (%s)\n", board.CurrCard.String())
 		for i:=0; i<len(nextCards);i++ {
-			fmt.Printf("Card my turn card = (%s)\n", nextCards[i].String())
+			fmt.Printf("Card my turn = (%s)\n", nextCards[i].String())
 		}
 		fmt.Println(time.Since(t))
 		if err := com.Move(nextCards); err != nil {

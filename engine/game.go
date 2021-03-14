@@ -1,8 +1,6 @@
 package engine
 
 import (
-	"fmt"
-	"math"
 	"math/rand"
 )
 
@@ -13,17 +11,27 @@ type Node struct {
 	Nodes        []*Node
 	Parent       *Node
 	Lvl          uint8
-	MinE         float64
-	MaxE         float64
+	estims       []*Pair
+}
+
+type Pair struct {
+	E float32
+	C *Card
 }
 
 func (n *Node) Add(c *Node) {
 	n.Nodes = append(n.Nodes, c)
 }
 
-func (n *Node) AddE(e float64) {
-	n.MinE = math.Min(n.MinE, e)
-	n.MaxE = math.Max(n.MaxE, e)
+func (n *Node) AddE(e float32, c *Card) {
+	n.estims = append(n.estims, &Pair{e, c})
+}
+
+func (n *Node) AddPairE(p *Pair) {
+	if p == nil {
+		return
+	}
+	n.estims = append(n.estims, p)
 }
 
 func GetNextCard(hand []Card, opponent []Card, curr *Card) []Card {
@@ -40,7 +48,6 @@ func GetNextCard(hand []Card, opponent []Card, curr *Card) []Card {
 	usedCards := map[Card]struct{}{}
 	for i := 0; i < len(hand); i++ {
 		if _, ok := usedCards[hand[i]]; !ok && CanNextMove(&hand[i], curr) {
-			fmt.Println(hand[i].String(), curr.String())
 			n := &Node{
 				Hand:         remove(hand, i),
 				Curr:         &hand[i],
@@ -75,7 +82,6 @@ func GetNextCard(hand []Card, opponent []Card, curr *Card) []Card {
 		usedCards := map[Card]struct{}{}
 		for i := 0; i < len(l); i++ {
 			if _, ok := usedCards[l[i]]; !ok && CanNextMove(&l[i], node.Curr) {
-				fmt.Println(l[i].String(), node.Curr.String())
 				isLeaf = false
 				next := &Node{
 					Hand:         remove(l, i),
@@ -95,57 +101,53 @@ func GetNextCard(hand []Card, opponent []Card, curr *Card) []Card {
 		}
 	}
 
-	//estimations := map[float64]*Node{}
+	usedNodes := map[*Node]struct{}{}
 	for len(leafs) > 0 {
-		node := leafs[len(leafs)-1]
-		leafs[len(leafs)-1] = nil
-		leafs = leafs[:len(leafs)-1]
+		node := leafs[0]
+		leafs[0] = nil
+		leafs = leafs[1:]
+		if _, ok := usedNodes[node]; ok {
+			continue
+		}
+		usedNodes[node] = struct{}{}
 		if node.Parent == nil {
 			continue
 		}
 		if len(node.Nodes) == 0 {
 			e := heuristicsEstimation(node)
 			if node.Lvl&1 == 0 {
+				// even
 				e = -e
 			}
-			//estimations[e] = node
-			node.Parent.AddE(e)
+			node.Parent.AddE(e, node.Curr)
 		} else if node.Lvl&1 == 0 {
-			//estimations[node.MinE] = node
-			node.Parent.AddE(node.MinE)
+			// even
+			node.Parent.AddE(Max(node.estims).E, node.Curr)
 		} else {
-			//estimations[node.MaxE] = node
-			node.Parent.AddE(node.MaxE)
+			node.Parent.AddE(Min(node.estims).E, node.Curr)
 		}
+
 		leafs = append(leafs, node.Parent)
 	}
 
-	max := -math.MaxFloat64
-	var bestCard *Card
-	for i := 0; i < len(root.Nodes); i++ {
-		if root.Nodes[i].MaxE > max && root.Nodes[i].MaxE != 0{
-			max = root.Nodes[i].MaxE
-			bestCard = root.Nodes[i].Curr
+	best := Max(root.estims)
+	if best != nil {
+		if best.C.Type != Numeric {
+			return []Card{*best.C}
 		}
-		if root.Nodes[i].MinE > max {
-			max = root.Nodes[i].MinE
-			bestCard = root.Nodes[i].Curr
-		}
+		return groupCards(*best.C, hand)
 	}
-	if bestCard != nil {
-		return groupCards(*bestCard, hand)
-	}
-	return nil
+	return []Card{}
 }
 
-func heuristicsEstimation(node *Node) float64 {
-	return rand.Float64() * 700
+func heuristicsEstimation(node *Node) float32 {
+	return rand.Float32() * 700
 }
 
 func groupCards(bestCard Card, hand []Card) []Card {
 	var r []Card
 	for i := 0; i < len(hand); i++ {
-		if hand[i].Color == bestCard.Color {
+		if hand[i].Color == bestCard.Color && hand[i].Type == Numeric {
 			r = append(r, hand[i])
 		}
 	}
