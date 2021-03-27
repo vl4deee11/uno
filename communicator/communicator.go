@@ -111,10 +111,15 @@ func (c *Communicator) Board() (*BoardResp, error) {
 
 
 func (c *Communicator) Move(cards []engine.Card) error {
+	color := 0
+	if len(cards) > 0 {
+		color = int(cards[0].Color)
+	}
+
 	m := map[string]interface{}{
 		"token": c.token,
 		"matchId": c.matchId,
-		"color": cards[0].Color,
+		"color": color,
 	}
 	m["cards"] = cards
 

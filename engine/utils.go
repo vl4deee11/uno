@@ -1,33 +1,31 @@
 package engine
 
-func Min(values []*Pair) *Pair {
+import "errors"
+
+func MinE(values []float32) (float32, error) {
 	if len(values) == 0{
-		return nil
+		return -1, errors.New("empty array")
 	}
 
-	min := values[0].E
-	mP := values[0]
-	for _, p := range values {
-		if p.E < min {
-			min = p.E
-			mP = p
+	min := values[0]
+	for i := range values {
+		if values[i] < min {
+			min = values[i]
 		}
 	}
-	return mP
+	return min, nil
 }
 
-func Max(values []*Pair) *Pair {
+func MaxE(values []float32) (float32, error) {
 	if len(values) == 0{
-		return nil
+		return -1, errors.New("empty array")
 	}
 
-	max := values[0].E
-	mP := values[0]
-	for _, p := range values {
-		if p.E > max {
-			max = p.E
-			mP = p
+	max := values[0]
+	for i := range values {
+		if values[i] > max {
+			max = values[i]
 		}
 	}
-	return mP
+	return max, nil
 }
