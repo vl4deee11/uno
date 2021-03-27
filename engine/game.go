@@ -44,7 +44,7 @@ func GetNextCard(hand []Card, opponent []Card, curr *Card) []Card {
 	s := make([]*Node, 0)
 	usedCards := map[Card]struct{}{}
 	for i := 0; i < len(hand); i++ {
-		if _, ok := usedCards[hand[i]]; !ok && CanNextMove(&hand[i], curr) {
+		if _, ok := usedCards[hand[i]]; !ok && CanNextMoveFirst(&hand[i], curr) {
 			n := &Node{
 				Hand:         remove(hand, i),
 				table:        root.table,

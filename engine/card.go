@@ -59,6 +59,18 @@ func GetOpponentHand(hand []Card, discard []Card) []Card {
 	return rs
 }
 
+func CanNextMoveFirst(c *Card, d *Card) bool {
+	if c.Type != Numeric {
+		return true
+	}
+	if c.Color != d.Color && c.Num != d.Num {
+		// different color and number
+		return false
+	}
+
+	return true
+}
+
 func CanNextMove(c *Card, d *Card) bool {
 	if d.Type == Skip && c.Type != Skip {
 		// skip on table and our card is not skip

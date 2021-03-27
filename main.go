@@ -1,8 +1,10 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"log"
+	"os"
 	"time"
 	"uno/communicator"
 	"uno/engine"
@@ -16,7 +18,11 @@ func main() {
 		log.Fatal(err)
 	}
 
-	if err := com.StartGame(""); err != nil {
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Print("Enter token: ")
+	oToken, _ := reader.ReadString('\n')
+	oToken = oToken[:len(oToken)-1]
+	if err := com.StartGame(oToken); err != nil {
 		log.Fatal(err)
 	}
 
@@ -35,19 +41,17 @@ func main() {
 		fmt.Println("Next step")
 		t := time.Now()
 		discard = append(discard, board.CurrCard)
-		if board.CurrCard.Type == engine.Skip {
-			if err := com.Move(nil); err != nil {
-				panic(err)
-			}
-		}
-
 		opponent := engine.GetOpponentHand(board.Hand, discard)
 		nextCards := engine.GetNextCard(board.Hand, opponent, &board.CurrCard)
 		fmt.Printf("Card on board = (%s)\n", board.CurrCard.String())
-		for i:=0; i<len(nextCards);i++ {
+		for i := 0; i < len(nextCards); i++ {
 			fmt.Printf("Card my turn = (%s)\n", nextCards[i].String())
 		}
 		fmt.Println(time.Since(t))
+		for i := 0; i < len(board.Hand); i++ {
+			fmt.Printf("Card on hand = (%s)\n", board.Hand[i].String())
+		}
+
 		if err := com.Move(nextCards); err != nil {
 			log.Fatal(err)
 		}
