@@ -35,11 +35,8 @@ func GetNextCard(hand []Card, opponent []Card, curr *Card) []Card {
 				Parent:       nil,
 			}
 			next.PutOnTable(&hand[i])
-			e, err := DFS(next)
-			if err != nil {
-				continue
-			}
-			if e > max {
+			e := DFS(next, false)
+			if e >= max {
 				max = e
 				maxCard = hand[i]
 			}
@@ -53,14 +50,9 @@ func GetNextCard(hand []Card, opponent []Card, curr *Card) []Card {
 	return []Card{}
 }
 
-func DFS(node *Node) (float32, error) {
+func DFS(node *Node, maximizationStep bool) float32 {
 	if node.Lvl == 3 {
-		e := heuristicsEstimation(node)
-		if node.Lvl&1 == 0 {
-			// even (opponent turn)
-			e = -e
-		}
-		return e, nil
+		return heuristicsEstimation(node)
 	}
 	var l []Card
 	if node.Lvl == 1 {
@@ -69,8 +61,12 @@ func DFS(node *Node) (float32, error) {
 		l = node.Parent.Hand
 	}
 
+	var resEstimation float32 = math.MaxFloat32
+	if maximizationStep {
+		resEstimation = -resEstimation
+	}
+
 	usedCards := map[Card]struct{}{}
-	var estimations []float32
 	for i := 0; i < len(l); i++ {
 		if _, ok := usedCards[l[i]]; !ok && CanNextMove(&l[i], node.TopFromTable()) {
 			usedCards[l[i]] = struct{}{}
@@ -82,26 +78,25 @@ func DFS(node *Node) (float32, error) {
 				OpponentHand: node.Hand,
 			}
 			next.PutOnTable(&l[i])
-			e, err := DFS(next)
-			if err != nil {
-				continue
+			e := DFS(next, !maximizationStep)
+			if maximizationStep {
+				resEstimation = maxFloat32(resEstimation, e)
+			} else {
+				resEstimation = minFloat32(resEstimation, e)
 			}
-			estimations = append(estimations, e)
 		}
 	}
 
-	if node.Lvl&1 == 0 {
-		v, err := MaxE(estimations)
-		if err != nil {
-			return -1, err
+	if len(usedCards) == 0 {
+		e := heuristicsEstimation(node)
+		if !maximizationStep {
+			// even (opponent turn)
+			e = -e
 		}
-		return v, nil
+		return e
 	}
-	v, err := MinE(estimations)
-	if err != nil {
-		return -1, err
-	}
-	return v, nil
+
+	return resEstimation
 }
 
 func groupCardsByColor(bestCard Card, hand []Card) []Card {
