@@ -9,25 +9,29 @@ import (
 	"uno/engine"
 )
 
-
 type Communicator struct {
-	Url   string
-	Name  string
-	token string
+	Url     string
+	Name    string
+	token   string
 	matchId string
 }
 
 type startResp struct {
 	MatchId string `json:"matchId"`
-	Status uint8 `json:"status"`
+	Status  uint8  `json:"status"`
 }
 
 type BoardResp struct {
-	MatchId string `json:"matchId"`
-	Status engine.GameStatus `json:"status"`
-	MyMove bool `json:"myMove"`
-	Hand []engine.Card `json:"hand"`
-	CurrCard engine.Card `json:"currentCard"`
+	MatchId  string            `json:"matchId"`
+	Status   engine.GameStatus `json:"status"`
+	MyMove   bool              `json:"myMove"`
+	Hand     []engine.Card     `json:"hand"`
+	CurrCard engine.Card       `json:"currentCard"`
+}
+
+type badRequest struct {
+	errorCode   int    `json:"errorCode"`
+	description string `json:"description"`
 }
 
 func (c *Communicator) Token() error {
@@ -109,7 +113,6 @@ func (c *Communicator) Board() (*BoardResp, error) {
 	return br, nil
 }
 
-
 func (c *Communicator) Move(cards []engine.Card) error {
 	color := 0
 	if len(cards) > 0 {
@@ -117,11 +120,12 @@ func (c *Communicator) Move(cards []engine.Card) error {
 	}
 
 	m := map[string]interface{}{
-		"token": c.token,
+		"token":   c.token,
 		"matchId": c.matchId,
-		"color": color,
+		"color":   color,
 	}
 	m["cards"] = cards
+
 
 	jd, err := json.Marshal(m)
 	if err != nil {
@@ -137,7 +141,12 @@ func (c *Communicator) Move(cards []engine.Card) error {
 		return err
 	}
 	if resp.StatusCode != http.StatusOK {
-		return errors.New(fmt.Sprintf("start game exit with code = %d", resp.StatusCode))
+		var res badRequest
+
+		if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+			return err
+		}
+		return errors.New(fmt.Sprintf("start game exit with code = %d, %s", resp.StatusCode, res.description))
 	}
 	fmt.Printf("Make turn\n")
 	return nil
