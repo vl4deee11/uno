@@ -32,13 +32,15 @@ func main() {
 			log.Fatal(err)
 		}
 		if !board.MyMove {
+			fmt.Println("Opponent turn")
 			continue
 		}
+		fmt.Println("My turn")
 		if board.Status != engine.InProcess {
 			fmt.Println("Game is end")
 			return
 		}
-		fmt.Println("Next step")
+
 		t := time.Now()
 		discard = append(discard, board.CurrCard)
 		if board.CurrCard.Type == engine.Skip {
