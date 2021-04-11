@@ -65,7 +65,7 @@ func GetNextCard(hand []Card, opponent []Card, curr *Card) []Card {
 }
 
 func DFS(node *Node, maximizationStep bool) (float32, error) {
-	if node.Lvl == 3 {
+	if node.Lvl == 6 {
 		e := heuristicsEstimation(node)
 		if !maximizationStep {
 			// even (opponent turn)
