@@ -58,8 +58,9 @@ func GetOpponentHand(hand []Card, discard []Card) []Card {
 
 	return rs
 }
+
 func CanNextMoveFirst(c *Card, d *Card) bool {
-	if c.Type != Numeric {
+	if c.Type == TakeFourChooseColor || c.Type == ChooseColor {
 		return true
 	}
 
