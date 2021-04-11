@@ -8,9 +8,11 @@ func heuristicsEstimation(node *Node) float32 {
 	}
 
 	topCard := node.TopFromTable()
-	sameColor:=0
-	for i:=0;i<len(node.Hand);i++{
-		if node.Hand[i].Color == topCard.Color {sameColor++}
+	sameColor := 0
+	for i := 0; i < len(node.Hand); i++ {
+		if node.Hand[i].Color == topCard.Color {
+			sameColor++
+		}
 	}
 
 	sameNumber := 0
@@ -23,7 +25,7 @@ func heuristicsEstimation(node *Node) float32 {
 	}
 
 	uselessCards := len(node.Hand) - sameNumber - sameColor
-	goodCards := float32(sameColor+sameNumber)*0.5
-	badCards := 0.35*float32(uselessCards)
+	goodCards := float32(sameColor+sameNumber) * 0.5
+	badCards := 0.35 * float32(uselessCards)
 	return goodCards - badCards
 }
