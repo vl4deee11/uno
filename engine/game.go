@@ -55,14 +55,22 @@ func GetNextCard(hand []Card, opponent []Card, curr *Card) []Card {
 	}
 
 	if maxCard.Num != -11 {
+		if maxCard.Type == Numeric {
+			groupedByColor := groupCardsByColor(maxCard, hand)
+			groupedByNumber := groupCardsByNumber(maxCard, hand)
+			if len(groupedByColor) > len(groupedByNumber) {
+				return groupedByColor
+			}
+			return groupedByNumber
+		}
 		return []Card{maxCard}
 	}
 
 	return []Card{}
 }
 
-func DFS(node *Node, maximizationStep bool) (float32) {
-	if node.Lvl == 6 {
+func DFS(node *Node, maximizationStep bool) float32 {
+	if node.Lvl == 10 {
 		return heuristicsEstimation(node)
 	}
 	var l []Card
@@ -89,7 +97,7 @@ func DFS(node *Node, maximizationStep bool) (float32) {
 				OpponentHand: node.Hand,
 			}
 			next.PutOnTable(&l[i])
-			e:= DFS(next, !maximizationStep)
+			e := DFS(next, !maximizationStep)
 			if maximizationStep {
 				resEstimation = maxFloat32(resEstimation, e)
 				alpha = maxFloat32(alpha, e)
@@ -105,7 +113,7 @@ func DFS(node *Node, maximizationStep bool) (float32) {
 			}
 		}
 	}
-	if len(usedCards) == 0{
+	if len(usedCards) == 0 {
 		e := heuristicsEstimation(node)
 		if !maximizationStep {
 			// even (opponent turn)
@@ -121,6 +129,16 @@ func groupCardsByColor(bestCard Card, hand []Card) []Card {
 	var r []Card
 	for i := 0; i < len(hand); i++ {
 		if hand[i].Color == bestCard.Color && hand[i].Type == Numeric {
+			r = append(r, hand[i])
+		}
+	}
+	return r
+}
+
+func groupCardsByNumber(bestCard Card, hand []Card) []Card {
+	var r []Card
+	for i := 0; i < len(hand); i++ {
+		if hand[i].Num == bestCard.Num && hand[i].Type == Numeric {
 			r = append(r, hand[i])
 		}
 	}
