@@ -42,11 +42,6 @@ func main() {
 		}
 		t := time.Now()
 		discard = append(discard, board.CurrCard)
-		if board.CurrCard.Type == engine.Skip {
-			if err := com.Move(nil); err != nil {
-				panic(err)
-			}
-		}
 
 		opponent := engine.GetOpponentHand(board.Hand, discard)
 		nextCards := engine.GetNextCard(board.Hand, opponent, &board.CurrCard)
