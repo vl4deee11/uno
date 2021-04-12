@@ -110,7 +110,7 @@ func DFS(node *Node, maximizationStep bool) float32 {
 func groupCardsByColor(bestCard Card, hand []Card) []Card {
 	var r []Card
 	for i := 0; i < len(hand); i++ {
-		if hand[i].Color == bestCard.Color && hand[i].Type == Numeric {
+		if hand[i].Color == bestCard.Color && hand[i].Num == bestCard.Num && hand[i].Type == Numeric {
 			r = append(r, hand[i])
 		}
 	}
