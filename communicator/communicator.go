@@ -95,6 +95,7 @@ func (c *Communicator) StartGame(oToken string) error {
 
 	}
 
+	fmt.Println("Match token =", res.MatchId)
 	c.matchId = res.MatchId
 	fmt.Printf("Game started\n")
 	return nil
