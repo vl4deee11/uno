@@ -92,8 +92,9 @@ func (c *Communicator) StartGame(oToken string) error {
 
 	if res.Status == 0 {
 		return errors.New("cannot start game in queue")
-
 	}
+
+	fmt.Println("Match token =", res.MatchId)
 
 	c.matchId = res.MatchId
 	fmt.Printf("Game started\n")
