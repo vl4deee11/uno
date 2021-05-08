@@ -98,10 +98,14 @@ func DFS(node *Node, maximizationStep bool) float32 {
 			}
 			next.PutOnTable(&l[i])
 
-			}
 		}
 	}
 
+	if len(usedCards) == 0 {
+		e := heuristicsEstimation(node)
+		if !maximizationStep {
+			// even (opponent turn)
+			e = -e
 		}
 		return e
 	}
