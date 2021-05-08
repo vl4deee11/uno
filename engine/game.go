@@ -97,27 +97,11 @@ func DFS(node *Node, maximizationStep bool) float32 {
 				OpponentHand: node.Hand,
 			}
 			next.PutOnTable(&l[i])
-			e := DFS(next, !maximizationStep)
-			if maximizationStep {
-				resEstimation = maxFloat32(resEstimation, e)
-				alpha = maxFloat32(alpha, e)
-				if alpha >= beta {
-					break
-				}
-			} else {
-				resEstimation = minFloat32(resEstimation, e)
-				beta = minFloat32(beta, e)
-				if beta <= alpha {
-					break
-				}
+
 			}
 		}
 	}
-	if len(usedCards) == 0 {
-		e := heuristicsEstimation(node)
-		if !maximizationStep {
-			// even (opponent turn)
-			e = -e
+
 		}
 		return e
 	}

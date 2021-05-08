@@ -113,6 +113,10 @@ func (c *Card) String() string {
 	return fmt.Sprintf("Color = %s, Type = %s, Number = %d", c.color(), c.cType(), c.Num)
 }
 
+func (c *Card) StringTTS() string {
+	return fmt.Sprintf("Color %s, Type %s, Number %d", c.color(), c.cType(), c.Num)
+}
+
 func (c *Card) color() string {
 	switch c.Color {
 	case Red:
@@ -137,11 +141,11 @@ func (c *Card) cType() string {
 	case Skip:
 		return "Skip"
 	case TakeTwo:
-		return "TakeTwo"
+		return "Take Two"
 	case TakeFourChooseColor:
-		return "TakeFourChooseColor"
+		return "Take Four Choose Color"
 	case ChooseColor:
-		return "ChooseColor"
+		return "Choose Color"
 	default:
 		return "????"
 	}
