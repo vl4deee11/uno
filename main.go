@@ -11,7 +11,6 @@ import (
 )
 
 func main() {
-	engine.HelpToCard()
 	com := communicator.Communicator{Url: "https://unoserver20210412203209.azurewebsites.net", Name: "vl4deee11"}
 	engine.GenerateAllCards()
 	discard := make([]engine.Card, 0)
