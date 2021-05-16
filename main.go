@@ -11,6 +11,7 @@ import (
 )
 
 func main() {
+	engine.HelpToCard()
 	com := communicator.Communicator{Url: "https://unoserver20210412203209.azurewebsites.net", Name: "vl4deee11"}
 	engine.GenerateAllCards()
 	discard := make([]engine.Card, 0)
@@ -52,22 +53,27 @@ func main() {
 		for i := 0; i < len(nextCards); i++ {
 			fmt.Printf("Card my turn = (%s)\n", nextCards[i].String())
 		}
+
 		fmt.Println(time.Since(t))
 
-		cardsN := len(board.Hand) - len(nextCards)
-		if cardsN == 1 {
-			engine.Say("uno")
-		} else {
-			engine.Say(fmt.Sprintf("i have %d cards in my hands", cardsN))
-		}
 		for i := 0; i < len(board.Hand); i++ {
 			fmt.Printf("Card on hand = (%s)\n", board.Hand[i].String())
 		}
 
-		engine.SayTurn(nextCards)
-		if err := com.Move(nextCards); err != nil {
-			break
+
+		r := engine.HelpToCard(board.Hand)
+		if r != nil {
+			engine.Say("great!")
+			if err := com.Move(r); err != nil {
+				break
+			}
+		} else {
+			engine.SayTurn(nextCards)
+			if err := com.Move(nextCards); err != nil {
+				break
+			}
 		}
+
 	}
 
 	engine.Say("game is end, bye")

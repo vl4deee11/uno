@@ -8,9 +8,8 @@ import (
 
 const dir = "/Users/macbookpro/Downloads/learn/uno/"
 
-var pref = fmt.Sprintf("cd %s && . ./tts/venv/bin/activate && python3 tts/tts.py --text '", dir)
-
-const postf = "' && afplay gen.mp3"
+var prefTTS = fmt.Sprintf("cd %s && . ./tts/venv/bin/activate && python3 tts/tts.py --text '", dir)
+const postTTS = "' && afplay gen.mp3"
 
 func SayTurn(cards []Card) {
 	if len(cards) > 0 {
@@ -23,9 +22,9 @@ func SayTurn(cards []Card) {
 			"-c",
 			fmt.Sprintf(
 				"%si am going to make a move with the cards %s%s",
-				pref,
+				prefTTS,
 				strings.Join(phrases, ", and "),
-				postf,
+				postTTS,
 			),
 		).Output()
 		return
@@ -36,13 +35,13 @@ func SayTurn(cards []Card) {
 		"-c",
 		fmt.Sprintf(
 			"%s%s%s",
-			pref,
+			prefTTS,
 			"i have no cards to turn, and i will rely on luck",
-			postf,
+			postTTS,
 		),
 	).Output()
 }
 
 func Say(phrase string) {
-	exec.Command("bash", "-c", fmt.Sprintf("%s%s%s", pref, phrase, postf)).Output()
+	exec.Command("bash", "-c", fmt.Sprintf("%s%s%s", prefTTS, phrase, postTTS)).Output()
 }

@@ -9,7 +9,7 @@ with sr.Microphone() as source:
 
 try:
     text = r.recognize_google(audio)
-    print(text)
+    print(text.lower())
 except sr.UnknownValueError:
     print("Google Speech Recognition could not understand audio")
 except sr.RequestError as e:
